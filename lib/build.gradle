@@ -25,6 +25,7 @@ dependencies {
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'net.ruippeixotog:scala-scraper_2.13:2.2.0'
 
     // Use Scalatest for testing our library
     testImplementation 'junit:junit:4.13'
@@ -36,4 +37,13 @@ dependencies {
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     api 'org.apache.commons:commons-math3:3.6.1'
+}
+
+test {
+    testLogging {
+        exceptionFormat 'full'
+        showExceptions true
+        showStackTraces true
+        showStandardStreams true
+    }
 }
