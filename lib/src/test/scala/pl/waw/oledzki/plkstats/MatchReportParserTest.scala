@@ -21,8 +21,15 @@ class MatchReportParserTest extends AnyWordSpec with Matchers {
       game.events.collect { case t: TeamPlay => t}.size should be(18)
       game.events.collect { case m: MatchEvent => m }.size should be(11)
 
-      println("S>>>>>> " + game.events.collect { case oi: OtherIndividualPlayAction => oi }.size)
-      game.events.groupBy(_.getClass).foreach(println)
+      game.events.collect { case i: IndividualPlay => i.what }.groupBy(_.getClass).foreach {
+        case (klass: Class[_], items) =>
+          println(s"${items.size} - ${klass.getSimpleName}")
+      }
+      println("---------")
+      game.events.collect { case i: IndividualPlay => i.what }.collect { case oi: OtherIndividualPlayAction => oi }.groupBy(_.what).foreach {
+        case (what: String, items) =>
+          println(s"${items.size} - |$what|")
+      }
     }
   }
 }

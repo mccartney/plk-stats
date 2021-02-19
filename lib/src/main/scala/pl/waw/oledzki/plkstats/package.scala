@@ -14,12 +14,26 @@ package object plkstats {
   sealed trait IndividualPlayAction
 
   case class PointsScored(count: Int) extends IndividualPlayAction
+  case class MissedThrow(points: Int) extends IndividualPlayAction
   case class Turnover(how: String) extends IndividualPlayAction
   case object Steal extends IndividualPlayAction
   trait Rebound extends IndividualPlayAction
   case object OffensiveRebound extends Rebound
   case object DefensiveRebound extends Rebound
   case object Assist extends IndividualPlayAction
+  case object Block extends IndividualPlayAction
+
+  case object BeingFouled extends IndividualPlayAction
+  trait FoulPlay extends IndividualPlayAction
+  case object DefensiveFoul extends FoulPlay
+  case object OffensiveFoul extends FoulPlay
+
+
+  case object SubstitutedIn extends IndividualPlayAction
+  case object SubstitutedOut extends IndividualPlayAction
+
+  case object TipOffLost extends IndividualPlayAction
+  case object TipOffWon extends IndividualPlayAction
 
   case class OtherIndividualPlayAction(what: String) extends IndividualPlayAction
 

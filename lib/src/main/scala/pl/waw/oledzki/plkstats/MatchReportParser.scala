@@ -40,27 +40,49 @@ class MatchReportParser {
   }
 
   object Actions {
-    val CelnyZaTrzy = "celny .* za 3".r // TODO subtypes
-    val CelnyZaDwa = "celny .* za 2".r // TODO subtypes
-    val CelnyRzutWolny = "celny rzut wolny.*".r // TODO subtypes
-    val Strata = "strata - (.*)".r
+
+    val CelnyZaTrzy = "celny .* za 3".r
+    val CelnyZaDwa = "celny ((?:.* za 2)|(?:wsad)|(?:alley-oop)|(?:lay-up.*))".r
+    val CelnyRzutWolny = "celny rzut wolny.*".r
+    val NiecelnyZaTrzy = "niecelny .* za 3".r
+    val NiecelnyZaDwa = "niecelny ((?:.* za 2)|(?:lay-up.*))".r
+    val NiecelnyRzutWolny = "niecelny rzut wolny.*".r
+    val Strata = "strata (?:- )?(.*)".r
     val Przechwyt = "przechwyt".r
     val Zbiórka = "zbiórka w (.*)".r
     val Asysta = "asysta".r
+    val Faulowany = "faulowany".r
+    val FaulOsobisty = "faul osobisty".r
+    val FaulWAtaku = "faul w ataku".r
+    val Zmiana = "zmiana - (.*)".r
+    val RzutSedziowski = "(.*) rzut sędziowski".r
+    val Blok = "blok".r
   }
 
   private def classifyIndividualPlay(action: String): IndividualPlayAction = {
     import Actions._
 
     action match {
+      // TODO subtypes for points scored/missed throws, currently the info is ignored
       case Strata(how) => Turnover(how)
       case Przechwyt() => Steal
       case CelnyRzutWolny() => PointsScored(1)
-      case CelnyZaDwa() => PointsScored(2)
+      case CelnyZaDwa(_) => PointsScored(2)
       case CelnyZaTrzy() => PointsScored(3)
+      case NiecelnyRzutWolny() => MissedThrow(1)
+      case NiecelnyZaDwa(_) => MissedThrow(2)
+      case NiecelnyZaTrzy() => MissedThrow(3)
       case Zbiórka(where) if where == "ataku" => OffensiveRebound
       case Zbiórka(where) if where == "obronie" => DefensiveRebound
       case Asysta() => Assist
+      case Faulowany() => BeingFouled
+      case FaulOsobisty() => DefensiveFoul
+      case FaulWAtaku() => OffensiveFoul
+      case Zmiana(how) if how == "wejście" => SubstitutedIn
+      case Zmiana(how) if how == "zejście" => SubstitutedOut
+      case Blok() => Block
+      case RzutSedziowski(how) if how == "wygrany" => TipOffWon
+      case RzutSedziowski(how) if how == "przegrany" => TipOffLost
       case what => OtherIndividualPlayAction(what)
     }
   }
