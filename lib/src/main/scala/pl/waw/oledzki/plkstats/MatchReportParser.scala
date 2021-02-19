@@ -25,7 +25,8 @@ class MatchReportParser {
             require(what1.isEmpty ^ what2.isEmpty)
             val what = Seq(what1, what2).mkString("")
             Some(what match {
-              case IndividualPlayExpression(playerNo, playerName, action) => IndividualPlay(PlayerReference(playerNo, playerName), action)
+              case IndividualPlayExpression(playerNo, playerName, action) =>
+                IndividualPlay(PlayerReference(playerNo, playerName), classifyIndividualPlay(action))
               case _ => TeamPlay(what)
             })
           }
@@ -36,5 +37,31 @@ class MatchReportParser {
     }
     val todo = -1
     Match("TODO", "TODO", todo, todo, events)
+  }
+
+  object Actions {
+    val CelnyZaTrzy = "celny .* za 3".r // TODO subtypes
+    val CelnyZaDwa = "celny .* za 2".r // TODO subtypes
+    val CelnyRzutWolny = "celny rzut wolny.*".r // TODO subtypes
+    val Strata = "strata - (.*)".r
+    val Przechwyt = "przechwyt".r
+    val Zbiórka = "zbiórka w (.*)".r
+    val Asysta = "asysta".r
+  }
+
+  private def classifyIndividualPlay(action: String): IndividualPlayAction = {
+    import Actions._
+
+    action match {
+      case Strata(how) => Turnover(how)
+      case Przechwyt() => Steal
+      case CelnyRzutWolny() => PointsScored(1)
+      case CelnyZaDwa() => PointsScored(2)
+      case CelnyZaTrzy() => PointsScored(3)
+      case Zbiórka(where) if where == "ataku" => OffensiveRebound
+      case Zbiórka(where) if where == "obronie" => DefensiveRebound
+      case Asysta() => Assist
+      case what => OtherIndividualPlayAction(what)
+    }
   }
 }
