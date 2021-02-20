@@ -12,12 +12,6 @@ object HeatMapChartsPerMatch extends App {
 
   case class Scored(who: PlayerReference, matchMinute: Int, count: Int)
 
-  val pointsHistory2 = game.events
-    .collect { case ip: IndividualPlay => ip }
-    .filter(_.what.isInstanceOf[PointsScored])
-  println(pointsHistory2)
-
-
   val pointsHistory = game.events
     .collect { case ip: IndividualPlay => ip }
     .filter(_.what.isInstanceOf[PointsScored])
@@ -30,20 +24,14 @@ object HeatMapChartsPerMatch extends App {
 
   val scoringPlayers = pointsHistory.map(_.who).toSet.toList
 
-  println(pointsHistoryPerMinute)
-
   val chart = new HeatMapChart(800, 300, new XChartTheme())
   chart.addSeries("punkty", (0 to 39).toList.asJava, scoringPlayers.map(_.name).asJava,
     scoringPlayers.flatMap { player =>
       (0 to 39).map { minute =>
-        val points = pointsHistoryPerMinute.getOrElse((player, minute), 0)
-        if (points > 0) {
-          println(s">>>>>>>>>> MIN = ${minute} PLAYER = ${player} INDEX=${scoringPlayers.indexOf(player)} POINTS = $points")
-        }
         Array[Number](
           minute,
           scoringPlayers.indexOf(player),
-          points.asInstanceOf[Number]
+          pointsHistoryPerMinute.getOrElse((player, minute), 0).asInstanceOf[Number]
         )
       }
     }.asJava
