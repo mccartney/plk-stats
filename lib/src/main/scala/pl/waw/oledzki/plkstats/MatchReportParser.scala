@@ -14,20 +14,22 @@ class MatchReportParser {
     val doc = browser.parseFile(filePath)
     val quarters = (doc >> elementList("#playbyplay .kwarta")).dropRight(1)
     val events: Seq[Event] = quarters.flatMap { q =>
-      (q >> elementList("tr")).flatMap { play =>
+      (q >> elementList("tr")).zipWithIndex.flatMap { case (play, index: Int) =>
+        val quarterNo = index + 1
         val fields = play >> elementList("td")
         if (fields.nonEmpty) {
           require(fields.size == 5, s"There were ${fields.size}")
-          val what1 :: score1 :: time :: score2 :: what2 :: _ = fields.map(_.innerHtml.trim)
+          val what1 :: score1 :: timeLeftInQuarter :: score2 :: what2 :: _ = fields.map(_.innerHtml.trim)
+          val time = parseTime(quarterNo, timeLeftInQuarter)
           if (what1 == what2) {
-            Some(MatchEvent(what1))
+            Some(MatchEvent(time, what1))
           } else {
             require(what1.isEmpty ^ what2.isEmpty)
             val what = Seq(what1, what2).mkString("")
             Some(what match {
               case IndividualPlayExpression(playerNo, playerName, action) =>
-                IndividualPlay(PlayerReference(playerNo, playerName), classifyIndividualPlay(action))
-              case _ => TeamPlay(what)
+                IndividualPlay(time, PlayerReference(playerNo, playerName), classifyIndividualPlay(action))
+              case _ => TeamPlay(time, what)
             })
           }
         } else {
@@ -37,6 +39,20 @@ class MatchReportParser {
     }
     val todo = -1
     Match("TODO", "TODO", todo, todo, events)
+  }
+
+  // VisibleForTesting
+  private[plkstats] def parseTime(quarterNo: Int, timeLeftInQuarter: String): TimeIndication = {
+    val parts = timeLeftInQuarter.split(":")
+    require(parts.size == 3)
+    val minuteSecondHundredths = parts.map(_.toInt)
+    val minutesLeft :: secondsLeft :: hundredthsLeft :: _ = minuteSecondHundredths.toList
+
+    val hundredthsSinceQuarterStart = 100 * 60 * 10 - (hundredthsLeft + 100 * secondsLeft + 60 * 100 * minutesLeft)
+
+    TimeIndication(matchMinute = (quarterNo-1) * 10 + hundredthsSinceQuarterStart / (60 * 100),
+                   second = (hundredthsSinceQuarterStart % (60 * 100)) / 100,
+                   tenth = (hundredthsSinceQuarterStart % 100) / 10)
   }
 
   object Actions {

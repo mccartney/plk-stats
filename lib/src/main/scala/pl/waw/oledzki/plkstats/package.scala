@@ -4,12 +4,17 @@ package object plkstats {
 
   case class PlayerReference(number: String, name: String)
 
-  sealed trait Event
-  case class MatchEvent(what: String) extends Event
+  case class TimeIndication(matchMinute: Int, second: Int, tenth: Int = 0)
+
+  sealed trait Event {
+    def time: TimeIndication
+  }
+
+  case class MatchEvent(time: TimeIndication, what: String) extends Event
 
   trait Play extends Event
-  case class TeamPlay(what: String) extends Play
-  case class IndividualPlay(who: PlayerReference, what: IndividualPlayAction) extends Play
+  case class TeamPlay(time: TimeIndication, what: String) extends Play
+  case class IndividualPlay(time: TimeIndication, who: PlayerReference, what: IndividualPlayAction) extends Play
 
   sealed trait IndividualPlayAction
 
