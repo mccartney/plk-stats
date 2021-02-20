@@ -48,6 +48,7 @@ class MatchReportParserTest extends AnyWordSpec with Matchers {
 
       sut.parseTime(1, "10:00:00") should be(TimeIndication(0, 0))
       sut.parseTime(1, "09:59:00") should be(TimeIndication(0, 1))
+      sut.parseTime(1, "09:51:00") should be(TimeIndication(0, 9))
       sut.parseTime(1, "00:03:80") should be(TimeIndication(9, 56, 2))
       sut.parseTime(1, "00:00:00") should be(TimeIndication(10, 0))
       sut.parseTime(2, "10:00:00") should be(TimeIndication(10, 0))

@@ -13,8 +13,8 @@ class MatchReportParser {
     val browser = JsoupBrowser()
     val doc = browser.parseFile(filePath)
     val quarters = (doc >> elementList("#playbyplay .kwarta")).dropRight(1)
-    val events: Seq[Event] = quarters.flatMap { q =>
-      (q >> elementList("tr")).zipWithIndex.flatMap { case (play, index: Int) =>
+    val events: Seq[Event] = quarters.zipWithIndex.flatMap { case (q, index) =>
+      (q >> elementList("tr")).flatMap { case play =>
         val quarterNo = index + 1
         val fields = play >> elementList("td")
         if (fields.nonEmpty) {

@@ -12,6 +12,8 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
+
+    id 'application'
 }
 
 repositories {
@@ -26,6 +28,7 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'net.ruippeixotog:scala-scraper_2.13:2.2.0'
+    implementation 'org.knowm.xchart:xchart:3.8.0'
 
     // Use Scalatest for testing our library
     testImplementation 'junit:junit:4.13'
@@ -46,4 +49,8 @@ test {
         showStackTraces true
         showStandardStreams true
     }
+}
+
+application {
+    mainClassName = "pl.waw.oledzki.plkstats.HeatMapChartsPerMatch"
 }
