@@ -26,10 +26,11 @@ class MatchReportParser {
           } else {
             require(what1.isEmpty ^ what2.isEmpty)
             val what = Seq(what1, what2).mkString("")
+            val whichTeam = if (what2.trim.isEmpty) { 1 } else { 2 }
             Some(what match {
               case IndividualPlayExpression(playerNo, playerName, action) =>
-                IndividualPlay(time, PlayerReference(playerNo, playerName), classifyIndividualPlay(action))
-              case _ => TeamPlay(time, what)
+                IndividualPlay(time, PlayerReference(playerNo, playerName, whichTeam), classifyIndividualPlay(action))
+              case _ => TeamPlay(time, whichTeam, what)
             })
           }
         } else {
@@ -38,7 +39,9 @@ class MatchReportParser {
       }
     }
     val todo = -1
-    Match("TODO", "TODO", todo, todo, events)
+    Match("TODO", "TODO", todo, todo,
+      matchEvents = events.collect{case me: MatchEvent => me},
+      events.collect{case p: Play => p})
   }
 
   // VisibleForTesting
