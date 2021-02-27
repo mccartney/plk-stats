@@ -2,7 +2,7 @@ package pl.waw.oledzki
 
 package object plkstats {
 
-  case class PlayerReference(number: String, name: String)
+  case class PlayerReference(number: String, name: String, whichTeam: Int)
 
   case class TimeIndication(matchMinute: Int, second: Int, tenth: Int = 0)
 
@@ -13,7 +13,7 @@ package object plkstats {
   case class MatchEvent(time: TimeIndication, what: String) extends Event
 
   trait Play extends Event
-  case class TeamPlay(time: TimeIndication, what: String) extends Play
+  case class TeamPlay(time: TimeIndication, whichTeam: Int, what: String) extends Play
   case class IndividualPlay(time: TimeIndication, who: PlayerReference, what: IndividualPlayAction) extends Play
 
   sealed trait IndividualPlayAction
@@ -43,5 +43,7 @@ package object plkstats {
   case class OtherIndividualPlayAction(what: String) extends IndividualPlayAction
 
 
-  case class Match(team1: String, team2: String, score1: Int, score2: Int, events: Seq[Event])
+  case class Match(team1: String, team2: String, score1: Int, score2: Int,
+                   matchEvents: Seq[MatchEvent],
+                   plays: Seq[Play])
 }
