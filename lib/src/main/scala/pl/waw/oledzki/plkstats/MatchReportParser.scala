@@ -11,7 +11,7 @@ class MatchReportParser {
 
   def parseHtml(filePath: String): Match = {
     val browser = JsoupBrowser()
-    val doc = browser.parseFile(filePath)
+    val doc = browser.get(filePath)
     val quarters = (doc >> elementList("#playbyplay .kwarta")).dropRight(1)
     val events: Seq[Event] = quarters.zipWithIndex.flatMap { case (q, index) =>
       (q >> elementList("tr")).flatMap { case play =>

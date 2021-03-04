@@ -9,7 +9,7 @@ import scala.jdk.CollectionConverters._
 
 object HeatMapChartsPerMatch extends App {
 
-  val game = new MatchReportParser().parseHtml("src/test/resources/2021-02-26-legia-start.html")
+  val game = new MatchReportParser().parseHtml(args.head)
 
   case class Scored(who: PlayerReference, matchMinute: Int, count: Int)
 
